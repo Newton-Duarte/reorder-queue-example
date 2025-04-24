@@ -1,54 +1,51 @@
-# React + TypeScript + Vite
+# Reordenação de Fila
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositório contém um sistema de gerenciamento de filas que organiza a entrada de veículos (caminhões e carros) de acordo com regras específicas de negócio.
 
-Currently, two official plugins are available:
+## Visão Geral
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+O sistema gerencia movimentos de veículos em uma fila, com dois tipos principais:
 
-## Expanding the ESLint configuration
+- **Caminhões**: Veículos de maior prioridade
+- **Carros**: Veículos que devem seguir regras específicas de posicionamento
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Funcionalidades Principais
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### Reordenação de Fila
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+A funcionalidade principal deste sistema é a reordenação inteligente da fila de veículos, seguindo regras específicas:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Caminhões entram normalmente na fila
+2. Carros devem ser posicionados após um caminhão, com no máximo 3 carros consecutivos por caminhão
+3. O sistema reorganiza automaticamente a fila quando um novo veículo entra
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+### Estados dos Movimentos
+
+Os movimentos podem estar em diferentes estados:
+
+- `STATUS_AGUARDANDO_VEZ`: Veículos que podem ser reordenados na fila
+- `STATUS_EM_CARREGAMENTO`: Veículos em processo de carregamento (não podem ser reordenados)
+- `STATUS_EM_PATIO`: Veículos no pátio (não participam da fila)
+
+## Algoritmo de Reordenação
+
+O algoritmo principal verifica onde um carro deve ser inserido na fila:
+
+1. Busca todos os caminhões ativos na fila
+2. Para cada caminhão, verifica quantos carros consecutivos estão após ele
+3. Se encontrar um caminhão com menos de 3 carros consecutivos, posiciona o novo carro após o último carro deste grupo ou diretamente após o caminhão
+4. Verifica se a posição sugerida está ocupada por um movimento que pode ser reordenado
+5. Caso a posição esteja ocupada por um movimento em estado diferente de `AGUARDANDO_VEZ`, o algoritmo continua buscando outra posição válida
+
+## Tecnologias Utilizadas
+
+- Vite
+- React
+- TypeScript
+- TailwindCSS v4
+- Shadcn-UI
+- React Query
+
+---
+
+Este projeto é um exemplo didático de implementação de regras de negócio complexas para gerenciamento de filas.
